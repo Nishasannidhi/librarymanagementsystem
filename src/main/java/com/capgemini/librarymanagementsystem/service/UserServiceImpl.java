@@ -8,8 +8,8 @@ public class UserServiceImpl implements UserService{
 	UserDao userDao=new UserDaoImpl();
 
 	@Override
-	public User Login(User user) {
-		return userDao.Login(user);
+	public User login(String id, String password) {
+		return userDao.login(id, password);
 	}
 
 }

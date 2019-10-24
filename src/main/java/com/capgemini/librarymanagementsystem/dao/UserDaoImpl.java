@@ -2,30 +2,39 @@ package com.capgemini.librarymanagementsystem.dao;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
-
 import com.capgemini.librarymanagementsystem.beans.User;
 
 public class UserDaoImpl implements UserDao{
-	static String id;
-	private static EntityManagerFactory entityManagerFactory=Persistence.createEntityManagerFactory("TestPersistence");
+		static String id;
+		static EntityManagerFactory entityManagerFactory= Persistence.createEntityManagerFactory("TestPersistence");
+		EntityManager entityManager=null;
+		EntityTransaction transaction=null;
+		
+		@Override
+		public User login(String id, String password){
+			UserDaoImpl.id=id;
+			User user=null;
+			try {
+				entityManager= entityManagerFactory.createEntityManager();
+				transaction= entityManager.getTransaction();
+				transaction.begin();
+				user=entityManager.find(User.class, id);
+				transaction.commit();
 
-	@Override
-	public User Login(User user) {
-		User user1=null;
-		try {
-			EntityManager entityManager=entityManagerFactory.createEntityManager();
-			Query query=entityManager.createQuery("FROM User WHERE id=:id and password=:password", User.class);
-			this.id=user.getId();
-			query.setParameter("id", user.getId());
-			query.setParameter("password",user.getPassword());
-			user=(User) query.getSingleResult();
+				if(user.getPassword().equals(password) && user.getId()==id){
+					return user;
+				}else {
+					user=null;
+				}
+			} catch (Exception e) {
+				transaction.rollback();
+				e.printStackTrace();
+			}
 			entityManager.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}	
-		return user;
+			return user;
+		}
 	}
+	
 
-}

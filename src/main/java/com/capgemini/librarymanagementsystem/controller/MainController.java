@@ -1,33 +1,38 @@
 package com.capgemini.librarymanagementsystem.controller;
 
-import org.springframework.http.MediaType;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.servlet.ModelAndView;
 import com.capgemini.librarymanagementsystem.beans.User;
 import com.capgemini.librarymanagementsystem.service.UserService;
 import com.capgemini.librarymanagementsystem.service.UserServiceImpl;
-import com.capgemini.librarymanagementsystem.util.UserResponse;
 @RestController
+@CrossOrigin(origins = "*",allowedHeaders = "*",allowCredentials = "true")
 public class MainController {
-	UserService userService=new UserServiceImpl();
-	@PostMapping(path = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public UserResponse adminLogin(@RequestBody User user) {
-		
-		 user =  userService.Login(user);
+UserService serviceUser= new UserServiceImpl();
 
-		UserResponse response = new UserResponse();
-		if(user!=null) {
-			response.setStatusCode(201);
-			response.setMessage("Success");
-			response.setDescription("Login  Successfully");
-			response.setUser(user);
-		}else {
-			response.setStatusCode(401);
-			response.setMessage("Failed");
-			response.setDescription("Invalid Credentials");
-		}
-		return response;
-}
+	
+	@PostMapping("/login/{id}/{password}")
+	public User login(@PathVariable("id")String id,@PathVariable("password") String password, HttpServletRequest req) {
+
+		User user = null;
+		user = serviceUser.login(id, password);
+		
+		return user;
+		
+	}// End of login()
+	
+	@GetMapping("/logout")
+	public ModelAndView logOut(ModelAndView modelAndView,HttpSession session) {
+		session.invalidate();
+		modelAndView.setViewName("index");
+
+		return modelAndView;
+	}//end of getLoginForm()
+	
 }

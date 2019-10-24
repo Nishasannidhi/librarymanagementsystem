@@ -3,6 +3,7 @@ package com.capgemini.librarymanagementsystem.dao;
 import com.capgemini.librarymanagementsystem.beans.User;
 
 public interface UserDao {
-	public User Login(User user);
+	public User login(String id, String password);
+	
 
 }
